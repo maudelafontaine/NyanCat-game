@@ -1,6 +1,7 @@
 // The engine class will only be instantiated once. It contains all the logic
 // of the game relating to the interactions between the player and the
 // enemy and also relating to how our enemies are created and evolve over time
+
 class Engine {
   // The constructor has one parameter. It will refer to the DOM node that we will be adding everything to.
   // You need to provide the DOM node when you create an instance of the class
@@ -16,6 +17,10 @@ class Engine {
     this.enemies = [];
     // We add the background image to the game
     addBackground(this.root);
+
+    this.score = 0;
+
+    // this.finalScore = new Enemy(this.score);
   }
 
   // The gameLoop will run every few milliseconds. It does several things
@@ -39,6 +44,17 @@ class Engine {
       enemy.update(timeDiff);
     });
 
+    this.enemies.forEach((enemy) => {
+      if (enemy.destroyed) {
+        this.score += 1;
+      }
+    });
+    const score = document.querySelector("#score");
+    score.innerText = `score: ${this.score}`;
+    score.style.color = "pink";
+    score.style.margin = "5px";
+    score.style.fontWeight = "bold";
+    score.style.fontSize = "50x";
     // We remove all the destroyed enemies from the array referred to by \`this.enemies\`.
     // We use filter to accomplish this.
     // Remember: this.enemies only contains instances of the Enemy class.
@@ -53,11 +69,11 @@ class Engine {
       const spot = nextEnemySpot(this.enemies);
       this.enemies.push(new Enemy(this.root, spot));
     }
-
     // We check if the player is dead. If he is, we alert the user
     // and return from the method (Why is the return statement important?)
     if (this.isPlayerDead()) {
-      window.alert('Game over');
+      window.alert("Game over!");
+      window.alert(`You've scored : ${this.score}`);
       return;
     }
 
@@ -67,7 +83,17 @@ class Engine {
 
   // This method is not implemented correctly, which is why
   // the burger never dies. In your exercises you will fix this method.
+
   isPlayerDead = () => {
-    return false;
+    let dead = false;
+    this.enemies.forEach((enemy) => {
+      if (
+        enemy.x === this.player.x &&
+        GAME_HEIGHT - PLAYER_HEIGHT - ENEMY_HEIGHT <= enemy.y
+      ) {
+        dead = true;
+      }
+    });
+    return dead;
   };
 }
